@@ -106,13 +106,12 @@ export default {
 					if (this.spindle) {
 						// Set Spindle RPM
 						await this.sendCode(`M568 P${this.tool.number} F${this.inputValue}`);
-						//this.actualValue = parseFloat(this.inputValue);
 					} else if (this.inputValue >= -273.15 && this.inputValue <= 1999) {
 						if (this.tool) {
 							// Set tool temps
 							const currentTemps = this.tool[this.active ? 'active' : 'standby'];
 							const newTemps = currentTemps.map((temp, i) => (i === this.toolHeaterIndex) ? this.inputValue : temp, this).join(':');
-							await this.sendCode(`M568 P${this.tool.number} ${this.active ? 'S' : 'R'}${newTemps}`);
+							await this.sendCode(`G10 P${this.tool.number} ${this.active ? 'S' : 'R'}${newTemps}`);
 						} else if (this.bed) {
 							// Set bed temp
 							await this.sendCode(`M140 P${this.bedIndex} ${this.active ? 'S' : 'R'}${this.inputValue}`);
@@ -125,7 +124,7 @@ export default {
 							this.tools.forEach(function(tool) {
 								if (tool.heaters.length) {
 									const temps = tool.heaters.map(() => this.inputValue, this).join(':');
-									code += `M568 P${tool.number} ${this.active ? 'S' : 'R'}${temps}\n`;
+									code += `G10 P${tool.number} ${this.active ? 'S' : 'R'}${temps}\n`;
 								}
 							}, this);
 							this.heat.bedHeaters.forEach(function(bedHeater, bedIndex) {
